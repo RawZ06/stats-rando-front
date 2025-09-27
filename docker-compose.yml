@@ -23,7 +23,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
     labels:
-      labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pots.rule=Host(`stats.rawz06.fr`)"
       - "traefik.http.routers.pots.entrypoints=websecure"
