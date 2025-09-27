@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: pots-of-time-app
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      # Connexion interne au Postgres du compose (ne PAS utiliser le port exposé)
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_DB: ${PG_DB:-pots}
+      PG_USER: ${PG_USER:-pots_user}
+      PG_PASSWORD: ${PG_PASSWORD:?set in .env}
+      # Puppeteer (Dockerfile configure déjà un Chromium système)
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+      PUPPETEER_EXECUTABLE_PATH: "/usr/bin/chromium-browser"
+      PORT: 3000
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+
+      # --- Router HTTPS ---
+      - "traefik.http.routers.pots.rule=Host(`${STATS_DOMAIN}`)"
+      - "traefik.http.routers.pots.entrypoints=websecure"
+      - "traefik.http.routers.pots.tls=true"
+      # Si ton Traefik a un certresolver Let's Encrypt nommé 'letsencrypt':
+      - "traefik.http.routers.pots.tls.certresolver=letsencrypt"
+
+      # --- Service (port interne de l'app) ---
+      - "traefik.http.services.pots.loadbalancer.server.port=3000"
+
+      # --- (Optionnel) rediriger http->https, si tu as l’entrypoint 'web' ---
+      - "traefik.http.routers.pots-http.rule=Host(`${STATS_DOMAIN}`)"
+      - "traefik.http.routers.pots-http.entrypoints=web"
+      - "traefik.http.routers.pots-http.middlewares=pots-redirect"
+      - "traefik.http.middlewares.pots-redirect.redirectscheme.scheme=https"
+
+      # --- (Optionnel) middlewares utiles ---
+      - "traefik.http.middlewares.pots-headers.headers.stsseconds=15552000"
+      - "traefik.http.middlewares.pots-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.pots-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.pots-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.pots-headers.headers.contenttypenosniff=true"
+      - "traefik.http.routers.pots.middlewares=pots-headers"
+
+  db:
+    image: postgres:16-alpine
+    container_name: pots-of-time-db
+    ports:
+      # Expose Postgres sur un port externe non standard
+      - "${PG_PORT_EXTERNAL:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${PG_DB:-pots}
+      POSTGRES_USER: ${PG_USER:-pots_user}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?set in .env}
+    volumes:
+      - pots_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pots_pg_data:
+
+networks:
+  web:
+    external: true
