@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Duel — Pots of Time</title>
+<meta name="viewport" content="width=1280, initial-scale=1"/>
+<style>
+  /* ---- Thème marron/or Pots of Time ---- */
+  :root{
+    --gold-1:#f2d79b;
+    --gold-2:#ffd9a8;
+    --brown-1:#b67c3a;   /* haut */
+    --brown-2:#7b4c1a;   /* bas  */
+    --ink:#ffffff;
+    --ink-dim:#e7e7e7;
+    --panel-bg: rgba(255,255,255,.10);
+    --panel-border: rgba(255,255,255,.75);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.08), transparent),
+      linear-gradient(180deg, var(--brown-1) 0%, var(--brown-2) 100%);
+  }
+
+  /* Canevas 1280x720 */
+  .wrap{
+    width:1280px; height:720px;
+    margin:0 auto; padding:28px 28px 22px;
+    position:relative;
+  }
+
+  /* Cadre décoratif */
+  .frame{
+    position:absolute; inset:14px;
+    border:2px solid rgba(255,255,255,.35);
+    border-radius:10px;
+    pointer-events:none;
+  }
+  .frame::before, .frame::after{
+    content:""; position:absolute; left:18px; right:18px; height:2px;
+    background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,.0) 15%, rgba(255,255,255,.0) 85%, rgba(255,255,255,.35));
+  }
+  .frame::before{ top:18px; }
+  .frame::after{ top:28px; }
+
+  /* Titres */
+  .title{
+    text-align:center; font-weight:900; letter-spacing:.6px;
+    margin:0 0 10px; color:var(--gold-2); text-shadow:0 1px 0 rgba(0,0,0,.25);
+    font-size:30px;
+  }
+  .subtitle{
+    text-align:center; margin:-4px 0 12px; color:var(--ink-dim); font-weight:700; opacity:.9;
+  }
+
+  /* Disposition principale */
+  .grid{
+    display:grid; grid-template-columns: 1fr 440px 1fr; gap:16px; align-items:stretch;
+  }
+
+  /* Cartes joueurs */
+  .card{
+    background: var(--panel-bg);
+    border: 2px solid var(--panel-border);
+    border-radius: 16px;
+    padding:16px 14px;
+    text-align:center;
+    backdrop-filter: blur(1px);
+    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+  }
+  .name{
+    display:inline-block; padding:10px 18px;
+    border:2px solid var(--panel-border);
+    border-radius:14px; background: rgba(255,255,255,.08);
+    font-weight:900; letter-spacing:.5px; color:#fff; font-size:26px;
+    margin-bottom:10px;
+  }
+  .statgrid{ display:grid; grid-template-columns: repeat(5,1fr); gap:8px; margin:8px 0 14px; }
+  .k{ background:#0f0f0f88; border:1px solid #ffffff66; border-radius:10px; padding:8px 6px; }
+  .k .lab{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.4px; }
+  .k .val{ margin-top:4px; font-size:20px; font-weight:900; color:var(--gold-1); text-shadow:0 1px 0 rgba(0,0,0,.25); }
+  .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,monospace; }
+
+  .block{
+    margin-top:6px;
+  }
+  .block .lab{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.4px; }
+  .block .val{ margin-top:4px; font-size:22px; font-weight:900; color:var(--gold-1); }
+
+  /* Centre (confrontations) */
+  .center{
+    background: var(--panel-bg);
+    border: 2px solid var(--panel-border);
+    border-radius: 16px;
+    padding:16px 14px;
+    text-align:center;
+    backdrop-filter: blur(1px);
+    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+  }
+  .centerTitle{ font-weight:800; margin-bottom:8px; }
+  .donut{
+    width:380px; height:380px; margin:0 auto; position:relative;
+  }
+  .donut .inner{
+    position:absolute; inset:30% 30%;
+    background:#0f0f0f; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold-2); font-weight:900; font-size:28px;
+    border:2px solid var(--panel-border);
+    text-shadow:0 1px 0 rgba(0,0,0,.25);
+  }
+  .centerRow{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+  .item .lab{ font-size:12px; color:var(--ink-dim); text-transform:uppercase; }
+  .item .val{ margin-top:4px; font-size:22px; font-weight:900; color:var(--gold-1); }
+
+  /* Bas de page */
+  .footer{
+    position:absolute; left:28px; right:28px; bottom:16px;
+    display:flex; justify-content:space-between; align-items:center;
+    color:var(--ink-dim); font-size:12px;
+  }
+  .brand{
+    display:inline-block; padding:8px 14px;
+    border:2px solid var(--panel-border); border-radius:12px;
+    background: rgba(255,255,255,.08);
+    font-weight:900; letter-spacing:.6px; color:#fff;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="frame" aria-hidden="true"></div>
+
+  <h1 class="title">Winner Bracket — Round 1</h1>
+  <div class="subtitle"><%= data.left.name %> vs <%= data.right.name %></div>
+
+  <div class="grid">
+
+    <!-- Joueur gauche -->
+    <div class="card">
+      <div class="name"><%= data.left.name %></div>
+
+      <div class="statgrid">
+        <div class="k"><div class="lab">1er</div><div class="val"><%= data.left.firsts %></div></div>
+        <div class="k"><div class="lab">2e</div><div class="val"><%= data.left.seconds %></div></div>
+        <div class="k"><div class="lab">3e</div><div class="val"><%= data.left.thirds %></div></div>
+        <div class="k"><div class="lab">DNF</div><div class="val"><%= data.left.forfeits %></div></div>
+        <div class="k"><div class="lab">Best</div><div class="val mono"><%= metrics.bestLeft %></div></div>
+      </div>
+
+      <div class="block">
+        <div class="lab">Nombre de races</div>
+        <div class="val"><%= data.left.races %></div>
+      </div>
+    </div>
+
+    <!-- Centre -->
+    <div class="center">
+      <div class="centerTitle">Confrontations directes</div>
+      <div class="donut">
+        <svg viewBox="0 0 100 100" width="380" height="380">
+          <!-- fond cercle -->
+          <circle cx="50" cy="50" r="40" stroke="#ffffff33" stroke-width="20" fill="none"/>
+          <!-- gauche (ocre pâle) -->
+          <circle cx="50" cy="50" r="40" stroke="#f2d79b" stroke-width="20"
+                  stroke-dasharray="<%= metrics.leftPct * 2.513 %> 999" stroke-linecap="butt" fill="none"
+                  transform="rotate(-90 50 50)"/>
+          <!-- droite (blanc) -->
+          <circle cx="50" cy="50" r="40" stroke="#ffffff" stroke-width="20"
+                  stroke-dasharray="<%= metrics.rightPct * 2.513 %> 999" stroke-linecap="butt" fill="none"
+                  transform="rotate(<%= (metrics.leftPct*3.6) - 90 %> 50 50)"/>
+        </svg>
+        <div class="inner"><%= data.leftWins %> - <%= data.rightWins %></div>
+      </div>
+
+      <div class="centerRow">
+        <div class="item"><div class="lab">Races communes</div><div class="val"><%= data.racesCommon %></div></div>
+        <div class="item"><div class="lab">Victoires gauche</div><div class="val"><%= data.leftWins %></div></div>
+        <div class="item"><div class="lab">Victoires droite</div><div class="val"><%= data.rightWins %></div></div>
+      </div>
+    </div>
+
+    <!-- Joueur droit -->
+    <div class="card">
+      <div class="name"><%= data.right.name %></div>
+
+      <div class="statgrid">
+        <div class="k"><div class="lab">1er</div><div class="val"><%= data.right.firsts %></div></div>
+        <div class="k"><div class="lab">2e</div><div class="val"><%= data.right.seconds %></div></div>
+        <div class="k"><div class="lab">3e</div><div class="val"><%= data.right.thirds %></div></div>
+        <div class="k"><div class="lab">DNF</div><div class="val"><%= data.right.forfeits %></div></div>
+        <div class="k"><div class="lab">Best</div><div class="val mono"><%= metrics.bestRight %></div></div>
+      </div>
+
+      <div class="block">
+        <div class="lab">Nombre de races</div>
+        <div class="val"><%= data.right.races %></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="brand">OOT Randomizer — Pots of Time</div>
+    <div><%= metrics.now %></div>
+  </div>
+</div>
+</body>
+</html>
