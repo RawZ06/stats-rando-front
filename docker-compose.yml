@@ -26,7 +26,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.pots.rule=Host(`stats.rawz06.fr`)"
       - "traefik.http.routers.pots.entrypoints=websecure"
-      - "traefik.http.routers.pots.tls.certresolver=myresolver
+      - "traefik.http.routers.pots.tls.certresolver=myresolver"
+    networks:
+      - web
+
   db:
     image: postgres:16-alpine
     container_name: pots-of-time-db
