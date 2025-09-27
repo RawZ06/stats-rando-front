@@ -29,6 +29,7 @@ services:
       - "traefik.http.routers.pots.tls.certresolver=myresolver"
     networks:
       - web
+      - pots
 
   db:
     image: postgres:16-alpine
@@ -48,6 +49,8 @@ services:
       timeout: 3s
       retries: 10
     restart: unless-stopped
+    networks:
+      - pots
 
 volumes:
   pots_pg_data:
@@ -55,3 +58,5 @@ volumes:
 networks:
   web:
     external: true
+  pots:
+    driver: bridge
