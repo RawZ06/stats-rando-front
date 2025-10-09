@@ -13,6 +13,12 @@ const __dirname = path.dirname(__filename);
 
 const app = Fastify({ logger: true });
 
+// Servir les fichiers statiques du dossier assets
+await app.register((await import('@fastify/static')).default, {
+  root: path.join(__dirname, 'assets'),
+  prefix: '/assets/'
+});
+
 // Connexion Postgres
 const pool = new Pool({
   host: process.env.PG_HOST || 'localhost',
@@ -134,13 +140,18 @@ const template = await readFile(path.join(__dirname, 'views', 'render.ejs'), 'ut
 
 // Route racine → redirection vers exemple
 app.get('/', async (req, reply) => {
-  reply.redirect('/preview?left=papy_grant&right=blueguy0014');
+  reply.redirect('/preview?left=papy_grant&right=Blueguy&left_twitch=papy_grant&right_twitch=blueguy0014&bracket=Winner%20Bracket&round=1');
 });
 
 // Route HTML
 app.get('/preview', async (req, reply) => {
   const left = String(req.query.left || 'papy_grant').trim();
   const right = String(req.query.right || 'blueguy0014').trim();
+  const leftTwitch = String(req.query.left_twitch || left).trim();
+  const rightTwitch = String(req.query.right_twitch || right).trim();
+  const bracket = String(req.query.bracket || 'Winner Bracket').trim();
+  const round = req.query.round ? String(req.query.round).trim() : null;
+  const group = req.query.group ? String(req.query.group).trim() : null;
 
   const [L, R, H] = await Promise.all([loadPlayer(left), loadPlayer(right), loadH2H(left, right)]);
   const totalWins = Math.max(1, H.aWins + H.bWins);
@@ -149,11 +160,14 @@ app.get('/preview', async (req, reply) => {
 
   const html = await ejs.render(template, {
     data: {
-      left: L,
-      right: R,
+      left: { ...L, twitch_name: leftTwitch },
+      right: { ...R, twitch_name: rightTwitch },
       racesCommon: H.racesCommon,
       leftWins: H.aWins,
-      rightWins: H.bWins
+      rightWins: H.bWins,
+      bracket,
+      round,
+      group
     },
     metrics: {
       leftPct,
@@ -171,7 +185,15 @@ app.get('/preview', async (req, reply) => {
 app.get('/render.png', async (req, reply) => {
   const left = req.query.left || 'papy_grant';
   const right = req.query.right || 'blueguy0014';
-  const url = `http://localhost:${process.env.PORT || 3000}/preview?left=${encodeURIComponent(left)}&right=${encodeURIComponent(right)}`;
+  const leftTwitch = req.query.left_twitch || left;
+  const rightTwitch = req.query.right_twitch || right;
+  const bracket = req.query.bracket || 'Winner Bracket';
+  const round = req.query.round || null;
+  const group = req.query.group || null;
+
+  let url = `http://localhost:${process.env.PORT || 3000}/preview?left=${encodeURIComponent(left)}&right=${encodeURIComponent(right)}&left_twitch=${encodeURIComponent(leftTwitch)}&right_twitch=${encodeURIComponent(rightTwitch)}&bracket=${encodeURIComponent(bracket)}`;
+  if (round) url += `&round=${encodeURIComponent(round)}`;
+  if (group) url += `&group=${encodeURIComponent(group)}`;
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -220,6 +242,6 @@ app.get('/globals.png', async (req, reply) => {
 // Lancer le serveur
 const port = Number(process.env.PORT || 3000);
 app.listen({ port, host: '0.0.0.0' }).then(() => {
-  app.log.info(`Preview: http://localhost:${port}/preview?left=papy_grant&right=blueguy0014`);
-  app.log.info(`render: http://localhost:${port}/render.png?left=papy_grant&right=blueguy0014`);
+  app.log.info(`Preview: http://localhost:${port}/preview?left=papy_grant&right=Blueguy&left_twitch=papy_grant&right_twitch=blueguy0014&bracket=Winner%20Bracket&round=1`);
+  app.log.info(`render: http://localhost:${port}/render.png?left=papy_grant&right=Blueguy&left_twitch=papy_grant&right_twitch=blueguy0014&bracket=Winner%20Bracket&round=1`);
 });

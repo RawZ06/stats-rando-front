@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "node --watch-path=. --watch-path=./views server.js",
     "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
+    "@fastify/static": "^7.0.4",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "fastify": "^4.28.1",

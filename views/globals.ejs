@@ -1,180 +1,138 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<title>Stats Globales — Pots of Time</title>
-<meta name="viewport" content="width=1280, initial-scale=1"/>
-<style>
-  /* ---- Base thème Pots of Time (marron/or) ---- */
-  :root{
-    --gold-1:#f2d79b;
-    --gold-2:#ffd9a8;
-    --brown-1:#b67c3a;   /* haut */
-    --brown-2:#7b4c1a;   /* bas  */
-    --ink:#ffffff;
-    --ink-dim:#e7e7e7;
-    --panel-bg: rgba(255,255,255,.10);
-    --panel-border: rgba(255,255,255,.75);
-  }
-  *{ box-sizing: border-box; }
-  html,body{ height:100%; margin:0; }
-  body{
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    color: var(--ink);
-    background:
-      radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.08), transparent),
-      linear-gradient(180deg, var(--brown-1) 0%, var(--brown-2) 100%);
-  }
-
-  /* Canevas 1280x720 */
-  .wrap{
-    width:1280px; height:720px;
-    margin:0 auto; padding:28px 28px 22px;
-    position:relative;
-  }
-
-  /* Cadres décoratifs (rappelle l’overlay) */
-  .frame{
-    position:absolute; inset:14px;
-    border:2px solid rgba(255,255,255,.35);
-    border-radius:10px;
-    pointer-events:none;
-  }
-  .frame::before, .frame::after{
-    content:""; position:absolute; left:18px; right:18px; height:2px;
-    background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,.0) 15%, rgba(255,255,255,.0) 85%, rgba(255,255,255,.35));
-  }
-  .frame::before{ top:18px; }
-  .frame::after{ top:28px; }
-
-  /* Titre */
-  .title{
-    text-align:center;
-    font-weight:900; letter-spacing:.5px;
-    margin:0 0 14px;
-    color:var(--gold-2);
-    text-shadow: 0 1px 0 rgba(0,0,0,.25);
-    font-size:30px;
-  }
-  .subtitle{
-    text-align:center; margin-top:-6px; margin-bottom:16px;
-    color:var(--ink-dim); font-weight:700; opacity:.9;
-  }
-
-  /* Cards */
-  .grid{
-    display:grid; gap:16px;
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .card{
-    background: var(--panel-bg);
-    border: 2px solid var(--panel-border);
-    border-radius: 16px;
-    padding:16px 14px;
-    text-align:center;
-    backdrop-filter: blur(1px);
-    box-shadow: 0 6px 18px rgba(0,0,0,.15);
-  }
-  .label{
-    text-transform:uppercase; letter-spacing:.5px;
-    font-size:12px; color:var(--ink-dim);
-  }
-  .value{
-    margin-top:6px;
-    font-size:28px; font-weight:900;
-    color:var(--gold-1);
-    text-shadow: 0 1px 0 rgba(0,0,0,.25);
-  }
-  .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,monospace; }
-
-  /* Bandeau bas (style overlay) */
-  .footer{
-    position:absolute; left:28px; right:28px; bottom:16px;
-    display:flex; justify-content:space-between; align-items:center;
-    color:var(--ink-dim); font-size:12px;
-  }
-  .brand{
-    display:inline-block; padding:8px 14px;
-    border:2px solid var(--panel-border); border-radius:12px;
-    background: rgba(255,255,255,.08);
-    font-weight:900; letter-spacing:.6px; color:#fff;
-  }
-
-  /* Petits encarts duo */
-  .pair{ display:flex; gap:10px; justify-content:center; }
-  .pill{
-    min-width:120px;
-    background: rgba(255,255,255,.08);
-    border:2px solid var(--panel-border);
-    border-radius:999px;
-    padding:8px 14px;
-    font-weight:800; color:var(--gold-2);
-  }
-</style>
+  <meta charset="utf-8"/>
+  <title>Stats Globales — Pots of Time</title>
+  <meta name="viewport" content="width=1280, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gold-1': '#f2d79b',
+            'gold-2': '#ffd9a8',
+            'brown-1': '#b67c3a',
+            'brown-2': '#7b4c1a',
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-<div class="wrap">
-  <div class="frame" aria-hidden="true"></div>
+<body class="h-full bg-gradient-to-b from-brown-1 to-brown-2 text-white font-sans">
 
-  <h1 class="title">Pots of Time — Stats globales</h1>
-  <div class="subtitle">Races &amp; Joueurs</div>
+  <!-- Container principal 1280x720 -->
+  <div class="w-[1280px] h-[720px] mx-auto py-7 px-7 relative">
 
-  <div class="grid">
-    <div class="card">
-      <div class="label">Nombre de races</div>
-      <div class="value"><%= g.nbRaces %></div>
+    <!-- Cadre décoratif -->
+    <div class="absolute inset-[14px] border-2 border-white/35 rounded-[10px] pointer-events-none">
+      <!-- Lignes horizontales décoratives -->
+      <div class="absolute top-[18px] left-[18px] right-[18px] h-[2px] bg-gradient-to-r from-white/35 via-transparent to-white/35"></div>
+      <div class="absolute top-[28px] left-[18px] right-[18px] h-[2px] bg-gradient-to-r from-white/35 via-transparent to-white/35"></div>
     </div>
 
-    <div class="card">
-      <div class="label">Joueurs (distinct)</div>
-      <div class="value"><%= g.players %></div>
+    <!-- Titre principal -->
+    <h1 class="text-center text-[30px] font-black tracking-wide text-gold-2 mb-3.5 drop-shadow-sm">
+      Pots of Time — Stats globales
+    </h1>
+
+    <!-- Sous-titre -->
+    <div class="text-center font-bold text-white/90 -mt-1.5 mb-4">
+      Races &amp; Joueurs
     </div>
 
-    <div class="card">
-      <div class="label">Joueurs / course (moy.)</div>
-      <div class="value"><%= g.avgNumberPlayer %></div>
-    </div>
+    <!-- Grille de cartes -->
+    <div class="grid grid-cols-3 gap-4">
 
-    <div class="card">
-      <div class="label">Temps moyen (HH:MM:SS)</div>
-      <div class="value mono"><%= fmt(g.avgTimeSec) %></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Meilleur temps moyen</div>
-      <div class="value mono"><%= fmt(g.avgBestTimeSec) %></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Pire temps moyen</div>
-      <div class="value mono"><%= fmt(g.avgWorstTimeSec) %></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Meilleur temps (global)</div>
-      <div class="value mono"><%= fmt(g.bestTimeSec) %></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Pire temps (global)</div>
-      <div class="value mono"><%= fmt(g.worstTimeSec) %></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Joueurs par course (min / max)</div>
-      <div class="value">
-        <div class="pair">
-          <div class="pill"><%= g.worstNumberPlayer %></div>
-          <div class="pill"><%= g.bestNumberPlayer %></div>
+      <!-- Nombre de races -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Nombre de races</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm">
+          <%= g.nbRaces %>
         </div>
       </div>
+
+      <!-- Joueurs (distinct) -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Joueurs (distinct)</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm">
+          <%= g.players %>
+        </div>
+      </div>
+
+      <!-- Joueurs / course (moy.) -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Joueurs / course (moy.)</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm">
+          <%= g.avgNumberPlayer %>
+        </div>
+      </div>
+
+      <!-- Temps moyen -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Temps moyen (HH:MM:SS)</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm font-mono">
+          <%= fmt(g.avgTimeSec) %>
+        </div>
+      </div>
+
+      <!-- Meilleur temps moyen -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Meilleur temps moyen</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm font-mono">
+          <%= fmt(g.avgBestTimeSec) %>
+        </div>
+      </div>
+
+      <!-- Pire temps moyen -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Pire temps moyen</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm font-mono">
+          <%= fmt(g.avgWorstTimeSec) %>
+        </div>
+      </div>
+
+      <!-- Meilleur temps (global) -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Meilleur temps (global)</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm font-mono">
+          <%= fmt(g.bestTimeSec) %>
+        </div>
+      </div>
+
+      <!-- Pire temps (global) -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Pire temps (global)</div>
+        <div class="mt-1.5 text-[28px] font-black text-gold-1 drop-shadow-sm font-mono">
+          <%= fmt(g.worstTimeSec) %>
+        </div>
+      </div>
+
+      <!-- Joueurs par course (min / max) -->
+      <div class="bg-white/10 border-2 border-white/75 rounded-2xl p-4 text-center backdrop-blur-sm shadow-lg">
+        <div class="uppercase tracking-wide text-xs text-white/90">Joueurs par course (min / max)</div>
+        <div class="mt-1.5 flex gap-2.5 justify-center">
+          <div class="min-w-[120px] bg-white/8 border-2 border-white/75 rounded-full py-2 px-3.5 font-black text-gold-2">
+            <%= g.worstNumberPlayer %>
+          </div>
+          <div class="min-w-[120px] bg-white/8 border-2 border-white/75 rounded-full py-2 px-3.5 font-black text-gold-2">
+            <%= g.bestNumberPlayer %>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Footer -->
+    <div class="absolute left-7 right-7 bottom-4 flex justify-between items-center text-xs text-white/90">
+      <div class="inline-block py-2 px-3.5 border-2 border-white/75 rounded-xl bg-white/8 font-black tracking-wider text-white">
+        OOT Randomizer — Pots of Time
+      </div>
+      <div><%= now %></div>
+    </div>
+
   </div>
 
-  <div class="footer">
-    <div class="brand">OOT Randomizer — Pots of Time</div>
-    <div><%= now %></div>
-  </div>
-</div>
 </body>
 </html>
