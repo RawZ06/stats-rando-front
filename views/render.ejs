@@ -92,6 +92,10 @@
     <div class="absolute text-[28px] font-black text-[#b67c3a] h-[32px] w-[100px] text-right flex items-center justify-center" style="top: var(--forfeits-top); left: var(--stats-left)">
       <%= data.left.forfeits %>
     </div>
+    <!-- Joueur GAUCHE - Total courses participées -->
+    <div class="absolute text-[28px] font-black text-white h-[32px] w-[300px] text-right flex items-center justify-center" style="top: calc(var(--forfeits-top) + 38px); left: var(--stats-left)">
+      TOTAL <%= data.left.races %>
+    </div>
 
     <!-- Joueur DROIT - Stats (1ER, 2ÈME, 3ÈME, DNF) -->
     <div class="absolute text-[38px] font-black text-[#b67c3a] h-[52px] w-[100px] flex items-center justify-center" style="top: var(--firsts-top); right: calc(var(--stats-right) + 40px)">
@@ -105,6 +109,10 @@
     </div>
     <div class="absolute text-[28px] font-black text-[#b67c3a] h-[32px] w-[100px] flex items-center justify-center" style="top: var(--forfeits-top); right: var(--stats-right)">
       <%= data.right.forfeits %>
+    </div>
+    <!-- Joueur DROIT - Total courses participées -->
+    <div class="absolute text-[28px] font-black text-white h-[32px] w-[300px] flex items-center justify-center" style="top: calc(var(--forfeits-top) + 38px); right: var(--stats-right)">
+      TOTAL <%= data.right.races %>
     </div>
 
     <!-- Graphique circulaire des confrontations -->
